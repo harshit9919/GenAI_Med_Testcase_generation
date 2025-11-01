@@ -2,8 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes bg-pan {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 body {
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.animated-background {
+  background: linear-gradient(
+    75deg,
+    hsl(var(--background)),
+    hsl(180 60% 92%),
+    hsl(var(--background))
+  );
+  background-size: 400% 400%;
+  animation: bg-pan 25s ease infinite;
+}
+
+.dark .animated-background {
+    background: linear-gradient(
+    75deg,
+    hsl(var(--background)),
+    hsl(224 60% 10%),
+    hsl(var(--background))
+  );
+  background-size: 400% 400%;
+  animation: bg-pan 25s ease infinite;
 }
 
 @layer base {

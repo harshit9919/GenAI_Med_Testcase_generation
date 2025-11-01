@@ -24,7 +24,6 @@ export default function StepIndicator({ steps, currentStepIndex }: StepIndicator
                   className="relative flex h-8 w-8 items-center justify-center rounded-full bg-primary"
                 >
                   <Check className="h-5 w-5 text-primary-foreground" aria-hidden="true" />
-                  <span className="sr-only">{step.name}</span>
                 </div>
               </>
             ) : stepIdx === currentStepIndex ? (
@@ -37,7 +36,6 @@ export default function StepIndicator({ steps, currentStepIndex }: StepIndicator
                   aria-current="step"
                 >
                   <span className="h-2.5 w-2.5 rounded-full bg-primary" aria-hidden="true" />
-                  <span className="sr-only">{step.name}</span>
                 </div>
               </>
             ) : (
@@ -49,11 +47,10 @@ export default function StepIndicator({ steps, currentStepIndex }: StepIndicator
                   className="group relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-border bg-background"
                 >
                    <span className="h-2.5 w-2.5 rounded-full bg-transparent" aria-hidden="true" />
-                   <span className="sr-only">{step.name}</span>
                 </div>
               </>
             )}
-             <p className="absolute -bottom-7 w-max font-medium text-sm text-center -translate-x-1/2 left-1/2">
+             <p className="absolute -bottom-7 w-max font-semibold text-sm text-center -translate-x-1/2 left-1/2">
                 {step.name}
              </p>
           </li>

@@ -7,11 +7,12 @@ import StepIndicator from '@/components/app/step-indicator';
 import Step1Upload from '@/components/app/step-1-upload';
 import Step2Parse from '@/components/app/step-2-parse';
 import Step3Generate from '@/components/app/step-3-generate';
-import Step4Dashboard from '@/components/app/step-4-dashboard';
-import { parseDocumentAction, generateTestCasesAction, refineTestCasesAction } from '@/lib/actions';
-import type { TestCase } from '@/lib/types';
+import Step4Compliance from '@/components/app/step-4-compliance';
+import Step5Dashboard from '@/components/app/step-5-dashboard';
+import { parseDocumentAction, generateTestCasesAction, refineTestCasesAction, analyzeComplianceAction } from '@/lib/actions';
+import type { TestCase, ComplianceIssue } from '@/lib/types';
 
-type AppStep = 'upload' | 'parse' | 'generate' | 'dashboard';
+type AppStep = 'upload' | 'parse' | 'generate' | 'compliance' | 'dashboard';
 
 export default function Home() {
   const [currentStep, setCurrentStep] = useState<AppStep>('upload');
@@ -21,8 +22,8 @@ export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [fileDataUri, setFileDataUri] = useState<string>('');
   const [parsedContent, setParsedContent] = useState('');
-  const [initialTestCases, setInitialTestCases] = useState<TestCase[]>([]);
-  const [refinedTestCases, setRefinedTestCases] = useState<TestCase[] | null>(null);
+  const [testCases, setTestCases] = useState<TestCase[]>([]);
+  const [complianceIssues, setComplianceIssues] = useState<ComplianceIssue[]>([]);
 
   const handleFileSelect = (selectedFile: File, dataUri: string) => {
     setFile(selectedFile);
@@ -57,14 +58,19 @@ export default function Home() {
     setIsLoading(false);
   };
 
-  const parseTestCases = (text: string): TestCase[] => {
+  const parseTestCasesString = (text: string): TestCase[] => {
     if (!text) return [];
-    // Split by lines that start with a number followed by a period.
     const caseBlocks = text.split(/(?=\d+\.\s)/).filter(block => block.trim() !== '');
-    return caseBlocks.map((block, index) => ({
-      id: `TC-${index + 1}`,
-      content: block.trim(),
-    }));
+    return caseBlocks.map((block, index) => {
+      const content = block.trim();
+      const firstLine = content.split('\n')[0];
+      const titleMatch = firstLine.match(/\d+\.\s+(.*)/);
+      return {
+        id: `TC-${index + 1}`,
+        title: titleMatch ? titleMatch[1] : `Test Case ${index + 1}`,
+        content: content,
+      };
+    });
   };
   
   const handleGenerateTestCases = async () => {
@@ -73,8 +79,7 @@ export default function Home() {
     if (result.error) {
       toast({ variant: 'destructive', title: 'Generation Error', description: result.error });
     } else if (result.testCases) {
-      setInitialTestCases(parseTestCases(result.testCases));
-      setRefinedTestCases(null); // Reset refined cases
+      setTestCases(parseTestCasesString(result.testCases));
       setCurrentStep('generate');
     }
     setIsLoading(false);
@@ -82,7 +87,7 @@ export default function Home() {
 
   const handleRefineTestCases = async (feedback: string) => {
     setIsLoading(true);
-    const currentTestCasesText = (refinedTestCases ?? initialTestCases).map(tc => tc.content).join('\n\n');
+    const currentTestCasesText = testCases.map(tc => tc.content).join('\n\n');
     const result = await refineTestCasesAction({ 
       initialTestCases: currentTestCasesText, 
       feedback, 
@@ -91,13 +96,29 @@ export default function Home() {
     if (result.error) {
       toast({ variant: 'destructive', title: 'Refinement Error', description: result.error });
     } else if (result.refinedTestCases) {
-      setRefinedTestCases(parseTestCases(result.refinedTestCases));
+      setTestCases(parseTestCasesString(result.refinedTestCases));
       toast({ title: 'Success', description: 'Test cases refined with your feedback.' });
     }
     setIsLoading(false);
   };
+  
+  const handleProceedToCompliance = async () => {
+    setIsLoading(true);
+    const testCasesText = testCases.map(tc => tc.content).join('\n\n');
+    const result = await analyzeComplianceAction({
+      testCases: testCasesText,
+      parsedRequirements: parsedContent,
+    });
+    if (result.error) {
+      toast({ variant: 'destructive', title: 'Compliance Analysis Error', description: result.error });
+    } else if (result.issues) {
+      setComplianceIssues(result.issues);
+      setCurrentStep('compliance');
+    }
+    setIsLoading(false);
+  }
 
-  const handleApproveTestCases = () => {
+  const handleApproveAndFinalize = () => {
     setCurrentStep('dashboard');
   };
 
@@ -105,22 +126,23 @@ export default function Home() {
     setFile(null);
     setFileDataUri('');
     setParsedContent('');
-    setInitialTestCases([]);
-    setRefinedTestCases(null);
+    setTestCases([]);
+    setComplianceIssues([]);
     setCurrentStep('upload');
   }
 
   const steps: { id: AppStep; name: string }[] = [
-    { id: 'upload', name: 'Upload Document' },
-    { id: 'parse', name: 'Review Parsed Content' },
-    { id: 'generate', name: 'Generate & Refine Cases' },
-    { id: 'dashboard', name: 'Export & Finish' },
+    { id: 'upload', name: 'Upload' },
+    { id: 'parse', name: 'Review' },
+    { id: 'generate', name: 'Generate' },
+    { id: 'compliance', name: 'Compliance' },
+    { id: 'dashboard', name: 'Export' },
   ];
 
   const currentStepIndex = steps.findIndex(s => s.id === currentStep);
 
   return (
-    <div className="flex min-h-screen w-full flex-col">
+    <div className="flex min-h-screen w-full flex-col bg-transparent">
       <AppHeader />
       <main className="flex flex-1 flex-col items-center gap-8 p-4 md:p-8">
         <div className="w-full max-w-6xl">
@@ -145,15 +167,24 @@ export default function Home() {
           )}
           {currentStep === 'generate' && (
             <Step3Generate
-              testCases={refinedTestCases ?? initialTestCases}
+              testCases={testCases}
               onRefine={handleRefineTestCases}
-              onApprove={handleApproveTestCases}
+              onProceed={handleProceedToCompliance}
+              isLoading={isLoading}
+            />
+          )}
+          {currentStep === 'compliance' && (
+            <Step4Compliance
+              testCases={testCases}
+              issues={complianceIssues}
+              onRefine={handleRefineTestCases}
+              onApprove={handleApproveAndFinalize}
               isLoading={isLoading}
             />
           )}
           {currentStep === 'dashboard' && (
-            <Step4Dashboard
-              testCases={refinedTestCases ?? initialTestCases}
+            <Step5Dashboard
+              testCases={testCases}
               onRestart={handleRestart}
             />
           )}

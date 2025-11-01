@@ -1,4 +1,3 @@
-// src/lib/actions.ts
 'use server';
 
 import { 
@@ -15,6 +14,11 @@ import {
   refineGeneratedTestCasesWithFeedback,
   type RefineGeneratedTestCasesWithFeedbackInput
 } from '@/ai/flows/refine-generated-test-cases-with-feedback';
+
+import {
+  analyzeCompliance,
+  type AnalyzeComplianceInput
+} from '@/ai/flows/analyze-compliance-flow';
 
 export async function parseDocumentAction(input: ParseDocumentAndGetFeedbackInput) {
   try {
@@ -45,3 +49,13 @@ export async function refineTestCasesAction(input: RefineGeneratedTestCasesWithF
     return { error: error instanceof Error ? error.message : 'An unknown error occurred during test case refinement.' };
   }
 }
+
+export async function analyzeComplianceAction(input: AnalyzeComplianceInput) {
+    try {
+      const output = await analyzeCompliance(input);
+      return { issues: output.issues };
+    } catch (error) {
+      console.error(error);
+      return { error: error instanceof Error ? error.message : 'An unknown error occurred during compliance analysis.' };
+    }
+  }

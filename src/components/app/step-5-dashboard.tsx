@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Download, RefreshCw, FileText } from 'lucide-react';
+import { RefreshCw, FileText } from 'lucide-react';
 import type { TestCase, Toolchain } from '@/lib/types';
 import { JiraIcon, PolarionIcon, AzureDevopsIcon } from './compliance-icons';
 import { useToast } from '@/hooks/use-toast';
@@ -20,12 +20,12 @@ const toolchains: Toolchain[] = [
   { id: 'azure', name: 'Azure DevOps', Icon: AzureDevopsIcon },
 ];
 
-interface Step4DashboardProps {
+interface Step5DashboardProps {
   testCases: TestCase[];
   onRestart: () => void;
 }
 
-export default function Step4Dashboard({ testCases, onRestart }: Step4DashboardProps) {
+export default function Step5Dashboard({ testCases, onRestart }: Step5DashboardProps) {
     const { toast } = useToast();
 
     const handleExport = (toolchainName: string) => {
@@ -57,7 +57,7 @@ export default function Step4Dashboard({ testCases, onRestart }: Step4DashboardP
               {testCases.map((tc, index) => (
                 <AccordionItem value={`item-${index}`} key={tc.id}>
                   <AccordionTrigger className="px-4 font-headline text-base hover:no-underline">
-                     <span className="truncate">{tc.id}: {tc.content.split('\\n')[0].split('. ')[1] || 'Test Case'}</span>
+                     <span className="truncate">{tc.id}: {tc.title}</span>
                   </AccordionTrigger>
                   <AccordionContent className="px-4">
                     <pre className="whitespace-pre-wrap p-4 font-code text-sm bg-background rounded-md">{tc.content}</pre>
@@ -69,7 +69,7 @@ export default function Step4Dashboard({ testCases, onRestart }: Step4DashboardP
         </CardContent>
         <CardFooter>
             <Button onClick={onRestart} variant="outline">
-                <RefreshCw />
+                <RefreshCw className="mr-2" />
                 Start New Session
             </Button>
         </CardFooter>
@@ -98,11 +98,11 @@ export default function Step4Dashboard({ testCases, onRestart }: Step4DashboardP
             </CardHeader>
             <CardContent className="space-y-3">
                 <Button className="w-full justify-start" variant="outline" onClick={() => handleDownload('CSV')}>
-                    <FileText />
+                    <FileText className="mr-2" />
                     Download as .csv
                 </Button>
                 <Button className="w-full justify-start" variant="outline" onClick={() => handleDownload('JSON')}>
-                    <FileText />
+                    <FileText className="mr-2" />
                     Download as .json
                 </Button>
             </CardContent>

@@ -1,7 +1,6 @@
-// src/lib/types.ts
-
 export interface TestCase {
   id: string;
+  title: string;
   content: string;
 }
 
@@ -11,11 +10,10 @@ export interface ComplianceStandard {
   Icon: React.FC<React.SVGProps<SVGSVGElement>>;
 }
 
-export interface ComplianceResult {
+export interface ComplianceIssue {
   testCaseId: string;
   standardId: string;
-  status: 'passed' | 'failed' | 'pending';
-  feedback?: string;
+  reason: string;
 }
 
 export interface Toolchain {
