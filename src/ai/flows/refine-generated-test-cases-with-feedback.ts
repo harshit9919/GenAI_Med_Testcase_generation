@@ -1,27 +1,18 @@
-// src/ai/flows/refine-generated-test-cases-with-feedback.ts
 'use server';
 /**
  * @fileOverview This flow refines generated test cases based on user feedback.
  *
  * - refineGeneratedTestCasesWithFeedback - This function takes generated test cases and user feedback, then refines the test cases.
- * - RefineGeneratedTestCasesWithFeedbackInput - The input type for the refineGeneratedTestCasesWithFeedback function.
- * - RefineGeneratedTestCasesWithFeedbackOutput - The return type for the refineGeneratedTestCasesWithFeedback function.
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {
+  RefineGeneratedTestCasesWithFeedbackInputSchema,
+  type RefineGeneratedTestCasesWithFeedbackInput,
+  RefineGeneratedTestCasesWithFeedbackOutputSchema,
+  type RefineGeneratedTestCasesWithFeedbackOutput
+} from './types';
 
-const RefineGeneratedTestCasesWithFeedbackInputSchema = z.object({
-  initialTestCases: z.string().describe('The initial set of generated test cases.'),
-  feedback: z.string().describe('User feedback on the initial test cases, including corrections and suggestions.'),
-  parsedRequirements: z.string().describe('The parsed requirements document to provide context.'),
-});
-export type RefineGeneratedTestCasesWithFeedbackInput = z.infer<typeof RefineGeneratedTestCasesWithFeedbackInputSchema>;
-
-const RefineGeneratedTestCasesWithFeedbackOutputSchema = z.object({
-  refinedTestCases: z.string().describe('The refined set of test cases based on user feedback.'),
-});
-export type RefineGeneratedTestCasesWithFeedbackOutput = z.infer<typeof RefineGeneratedTestCasesWithFeedbackOutputSchema>;
 
 export async function refineGeneratedTestCasesWithFeedback(
   input: RefineGeneratedTestCasesWithFeedbackInput

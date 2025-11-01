@@ -1,29 +1,31 @@
 'use server';
 
 import { 
-  parseDocumentAndGetFeedback,
-  type ParseDocumentAndGetFeedbackInput
+  parseDocumentAndGetFeedback
 } from '@/ai/flows/parse-document-and-get-feedback';
+import type { ParseDocumentAndGetFeedbackInput } from '@/ai/flows/types';
 
 import {
-  generateTestCases,
-  type GenerateTestCasesInput
+  generateTestCases
 } from '@/ai/flows/generate-test-cases-from-parsed-requirements';
+import type { GenerateTestCasesInput } from '@/ai/flows/types';
 
 import {
-  refineGeneratedTestCasesWithFeedback,
-  type RefineGeneratedTestCasesWithFeedbackInput
+  refineGeneratedTestCasesWithFeedback
 } from '@/ai/flows/refine-generated-test-cases-with-feedback';
+import type { RefineGeneratedTestCasesWithFeedbackInput } from '@/ai/flows/types';
 
 import {
-  analyzeCompliance,
-  type AnalyzeComplianceInput
+  analyzeCompliance
 } from '@/ai/flows/analyze-compliance-flow';
+import type { AnalyzeComplianceInput } from '@/ai/flows/types';
+
 
 import {
-  exportToJira,
-  type ExportToJiraInput
+  exportToJira
 } from '@/ai/flows/export-to-jira-flow';
+import type { ExportToJiraInput } from '@/ai/flows/types';
+
 
 export async function parseDocumentAction(input: ParseDocumentAndGetFeedbackInput) {
   try {

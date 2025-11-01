@@ -98,6 +98,7 @@ export default function Home() {
       toast({ variant: 'destructive', title: 'Refinement Error', description: result.error });
     } else if (result.refinedTestCases) {
       setTestCases(parseTestCasesString(result.refinedTestCases));
+      setCurrentStep('generate');
       toast({ title: 'Success', description: 'Test cases refined with your feedback.' });
     }
     setIsLoading(false);

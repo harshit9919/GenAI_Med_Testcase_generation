@@ -3,26 +3,16 @@
  * @fileOverview This file defines a Genkit flow for generating test cases from parsed requirements.
  *
  * generateTestCases - A function that generates test cases from parsed requirements.
- * GenerateTestCasesInput - The input type for the generateTestCases function.
- * GenerateTestCasesOutput - The return type for the generateTestCases function.
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {
+  GenerateTestCasesInputSchema,
+  type GenerateTestCasesInput,
+  GenerateTestCasesOutputSchema,
+  type GenerateTestCasesOutput
+} from './types';
 
-const GenerateTestCasesInputSchema = z.object({
-  parsedRequirements: z
-    .string()
-    .describe('The parsed requirements document as a string.'),
-});
-export type GenerateTestCasesInput = z.infer<typeof GenerateTestCasesInputSchema>;
-
-const GenerateTestCasesOutputSchema = z.object({
-  testCases: z
-    .string()
-    .describe('The generated test cases as a numbered, structured string.'),
-});
-export type GenerateTestCasesOutput = z.infer<typeof GenerateTestCasesOutputSchema>;
 
 export async function generateTestCases(
   input: GenerateTestCasesInput

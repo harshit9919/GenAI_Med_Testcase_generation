@@ -3,35 +3,16 @@
  * @fileOverview A Genkit flow for exporting test cases to Jira.
  *
  * exportToJira - A function that creates Jira issues from test cases.
- * ExportToJiraInput - The input type for the exportToJira function.
- * ExportToJiraOutput - The return type for the exportToJira function.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-
-const TestCaseSchema = z.object({
-  id: z.string().describe("The ID of the test case (e.g., 'TC-1')."),
-  title: z.string().describe('The title of the test case.'),
-  content: z.string().describe('The full content of the test case.'),
-});
-
-const JiraIssueSchema = z.object({
-  testCaseId: z.string(),
-  jiraIssueKey: z.string(),
-  jiraIssueUrl: z.string(),
-});
-
-export const ExportToJiraInputSchema = z.object({
-  testCases: z.array(TestCaseSchema).describe('An array of test cases to be exported.'),
-});
-export type ExportToJiraInput = z.infer<typeof ExportToJiraInputSchema>;
-
-export const ExportToJiraOutputSchema = z.object({
-  createdIssues: z.array(JiraIssueSchema).describe('A list of created Jira issues.'),
-});
-export type ExportToJiraOutput = z.infer<typeof ExportToJiraOutputSchema>;
-
+import {
+  ExportToJiraInputSchema,
+  type ExportToJiraInput,
+  ExportToJiraOutputSchema,
+  type ExportToJiraOutput
+} from './types';
 
 // This is a placeholder tool. In a real application, this would
 // interact with the Jira API to create an issue.
@@ -82,7 +63,7 @@ const exportToJiraFlow = ai.defineFlow(
       tools: [createJiraIssueTool],
     });
 
-    const createdIssues: z.infer<typeof JiraIssueSchema>[] = [];
+    const createdIssues = [];
     if (history) {
         for(const turn of history) {
             if (turn.role === 'model') {

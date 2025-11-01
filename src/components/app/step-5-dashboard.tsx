@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { RefreshCw, FileText } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import type { TestCase, Toolchain } from '@/lib/types';
 import { JiraIcon, PolarionIcon, AzureDevopsIcon } from './compliance-icons';
 import { useToast } from '@/hooks/use-toast';
@@ -29,14 +29,6 @@ interface Step5DashboardProps {
   exportToJiraAction: typeof exportToJiraAction;
 }
 
-const downloadFile = (content: string, fileName: string, contentType: string) => {
-    const a = document.createElement("a");
-    const file = new Blob([content], { type: contentType });
-    a.href = URL.createObjectURL(file);
-    a.download = fileName;
-    a.click();
-    URL.revokeObjectURL(a.href);
-};
 
 export default function Step5Dashboard({ testCases, onRestart, exportToJiraAction }: Step5DashboardProps) {
     const { toast } = useToast();
@@ -69,25 +61,6 @@ export default function Step5Dashboard({ testCases, onRestart, exportToJiraActio
             });
             console.log('Created Jira Issues:', result.createdIssues);
         }
-    };
-
-    const handleDownloadCSV = () => {
-        const headers = ['id', 'title', 'content'];
-        const csvRows = [
-            headers.join(','),
-            ...testCases.map(tc => {
-                const values = [tc.id, `"${tc.title.replace(/"/g, '""')}"`, `"${tc.content.replace(/"/g, '""')}"`];
-                return values.join(',');
-            })
-        ];
-        downloadFile(csvRows.join('\n'), 'test-cases.csv', 'text/csv');
-        toast({ title: 'Success', description: 'Test cases downloaded as CSV.'});
-    };
-
-    const handleDownloadJSON = () => {
-        const jsonContent = JSON.stringify(testCases, null, 2);
-        downloadFile(jsonContent, 'test-cases.json', 'application/json');
-        toast({ title: 'Success', description: 'Test cases downloaded as JSON.'});
     };
 
   return (
@@ -139,22 +112,6 @@ export default function Step5Dashboard({ testCases, onRestart, exportToJiraActio
           </CardContent>
         </Card>
 
-        <Card>
-            <CardHeader>
-                <CardTitle className="font-headline text-xl">Download Locally</CardTitle>
-                <CardDescription>Download test cases in various formats.</CardDescription>
-            </Header>
-            <CardContent className="space-y-3">
-                <Button className="w-full justify-start" variant="outline" onClick={handleDownloadCSV}>
-                    <FileText className="mr-2" />
-                    Download as .csv
-                </Button>
-                <Button className="w-full justify-start" variant="outline" onClick={handleDownloadJSON}>
-                    <FileText className="mr-2" />
-                    Download as .json
-                </Button>
-            </CardContent>
-        </Card>
       </div>
     </div>
   );

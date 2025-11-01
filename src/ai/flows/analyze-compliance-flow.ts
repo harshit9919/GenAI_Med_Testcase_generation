@@ -3,29 +3,15 @@
  * @fileOverview A Genkit flow for analyzing test cases against compliance standards.
  *
  * analyzeCompliance - A function that analyzes test cases.
- * AnalyzeComplianceInput - The input type for the analyzeCompliance function.
- * AnalyzeComplianceOutput - The return type for the analyzeCompliance function.
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-
-const ComplianceIssueSchema = z.object({
-  testCaseId: z.string().describe("The ID of the test case with the compliance issue (e.g., 'TC-1')."),
-  standardId: z.string().describe("The ID of the compliance standard that failed (e.g., 'fda', 'gdpr')."),
-  reason: z.string().describe("A brief explanation of why the test case fails the compliance check."),
-});
-
-const AnalyzeComplianceInputSchema = z.object({
-  testCases: z.string().describe('The full text of all generated test cases, separated by newlines.'),
-  parsedRequirements: z.string().describe('The parsed requirements document for context.'),
-});
-export type AnalyzeComplianceInput = z.infer<typeof AnalyzeComplianceInputSchema>;
-
-const AnalyzeComplianceOutputSchema = z.object({
-  issues: z.array(ComplianceIssueSchema).describe('A list of compliance issues found in the test cases.'),
-});
-export type AnalyzeComplianceOutput = z.infer<typeof AnalyzeComplianceOutputSchema>;
+import {
+  AnalyzeComplianceInputSchema,
+  type AnalyzeComplianceInput,
+  AnalyzeComplianceOutputSchema,
+  type AnalyzeComplianceOutput
+} from './types';
 
 export async function analyzeCompliance(
   input: AnalyzeComplianceInput
