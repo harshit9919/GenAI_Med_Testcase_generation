@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { LoadingSpinner } from './loading-spinner';
-import { Sparkles, Check, AlertTriangle, ChevronLeft } from 'lucide-react';
+import { Sparkles, Check, AlertTriangle } from 'lucide-react';
 import { FdaIcon, IecIcon, IsoIcon, GdprIcon } from './compliance-icons';
 import type { TestCase, ComplianceStandard, ComplianceIssue } from '@/lib/types';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -31,16 +31,18 @@ export default function Step4Compliance({ testCases, issues, onRefine, onApprove
   const [feedback, setFeedback] = useState('');
 
   const handleRefine = () => {
-    if (feedback.trim()) {
+    if (isLoading) return;
+    let combinedFeedback = feedback;
+    if (issues.length > 0) {
       const issueSummary = issues.map(i => `For ${i.testCaseId} (${i.standardId}): ${i.reason}`).join('; ');
-      const combinedFeedback = `The following compliance issues were found: ${issueSummary}. Please address these. Additional user feedback: ${feedback}`;
-      onRefine(combinedFeedback);
-      setFeedback('');
+      combinedFeedback = `The following compliance issues were found: ${issueSummary}. Please address these. Additional user feedback: ${feedback}`;
     }
+    onRefine(combinedFeedback);
+    setFeedback('');
   };
 
   const getStandardIcon = (standardId: string) => {
-    const standard = complianceStandards.find(s => s.id === standardId);
+    const standard = complianceStandards.find(s => s.id === standardId.toLowerCase());
     return standard ? <standard.Icon className="h-4 w-4" /> : null;
   };
 
